@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="batch_performance_summary" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7b9d24e5-5c93-46f8-a2f8-ead101000001">
+    <property name="com.jaspersoft.studio.data.defaultdataadapter" value="Student Result System MySQL"/>
+    <queryString>
+        <![CDATA[
+SELECT s.student_id,
+       s.full_name,
+       s.pathway,
+       m.module_code,
+       m.module_name,
+       m.credit_hours,
+       r.total_mark,
+       r.grade_letter,
+       r.grade_point,
+       r.status,
+       (SELECT AVG(r2.total_mark) FROM results r2) AS class_average,
+       (SELECT MAX(r2.total_mark) FROM results r2) AS highest_mark,
+       (SELECT MIN(r2.total_mark) FROM results r2) AS lowest_mark,
+       (SELECT 100.0 * SUM(r2.status='PASS') / NULLIF(COUNT(*),0) FROM results r2) AS pass_rate
+FROM students s
+JOIN enrollments e ON e.student_id = s.student_id
+JOIN modules m ON m.module_code = e.module_code
+LEFT JOIN results r ON r.enrollment_id = e.enrollment_id
+ORDER BY s.student_id, m.module_code
+        ]]>
+    </queryString>
+    <field name="student_id" class="java.lang.String"/>
+    <field name="full_name" class="java.lang.String"/>
+    <field name="pathway" class="java.lang.String"/>
+    <field name="module_code" class="java.lang.String"/>
+    <field name="module_name" class="java.lang.String"/>
+    <field name="credit_hours" class="java.lang.Integer"/>
+    <field name="total_mark" class="java.math.BigDecimal"/>
+    <field name="grade_letter" class="java.lang.String"/>
+    <field name="grade_point" class="java.math.BigDecimal"/>
+    <field name="status" class="java.lang.String"/>
+    <field name="class_average" class="java.math.BigDecimal"/>
+    <field name="highest_mark" class="java.math.BigDecimal"/>
+    <field name="lowest_mark" class="java.math.BigDecimal"/>
+    <field name="pass_rate" class="java.math.BigDecimal"/>
+    <title>
+        <band height="50">
+            <staticText>
+                <reportElement x="0" y="5" width="802" height="28"/>
+                <textElement textAlignment="Center">
+                    <font size="18" isBold="true"/>
+                </textElement>
+                <text><![CDATA[Batch Performance Summary Report]]></text>
+            </staticText>
+        </band>
+    </title>
+    <columnHeader>
+        <band height="24">
+            <staticText><reportElement x="0" y="0" width="95" height="20"/><text><![CDATA[Student ID]]></text></staticText>
+            <staticText><reportElement x="100" y="0" width="155" height="20"/><text><![CDATA[Student Name]]></text></staticText>
+            <staticText><reportElement x="260" y="0" width="80" height="20"/><text><![CDATA[Module]]></text></staticText>
+            <staticText><reportElement x="345" y="0" width="190" height="20"/><text><![CDATA[Module Name]]></text></staticText>
+            <staticText><reportElement x="540" y="0" width="60" height="20"/><text><![CDATA[Credits]]></text></staticText>
+            <staticText><reportElement x="605" y="0" width="60" height="20"/><text><![CDATA[Mark]]></text></staticText>
+            <staticText><reportElement x="670" y="0" width="60" height="20"/><text><![CDATA[Grade]]></text></staticText>
+            <staticText><reportElement x="735" y="0" width="65" height="20"/><text><![CDATA[Status]]></text></staticText>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="22">
+            <textField><reportElement x="0" y="0" width="95" height="18"/><textFieldExpression><![CDATA[$F{student_id}]]></textFieldExpression></textField>
+            <textField><reportElement x="100" y="0" width="155" height="18"/><textFieldExpression><![CDATA[$F{full_name}]]></textFieldExpression></textField>
+            <textField><reportElement x="260" y="0" width="80" height="18"/><textFieldExpression><![CDATA[$F{module_code}]]></textFieldExpression></textField>
+            <textField><reportElement x="345" y="0" width="190" height="18"/><textFieldExpression><![CDATA[$F{module_name}]]></textFieldExpression></textField>
+            <textField><reportElement x="540" y="0" width="60" height="18"/><textFieldExpression><![CDATA[$F{credit_hours}]]></textFieldExpression></textField>
+            <textField><reportElement x="605" y="0" width="60" height="18"/><textFieldExpression><![CDATA[$F{total_mark}]]></textFieldExpression></textField>
+            <textField><reportElement x="670" y="0" width="60" height="18"/><textFieldExpression><![CDATA[$F{grade_letter}]]></textFieldExpression></textField>
+            <textField><reportElement x="735" y="0" width="65" height="18"/><textFieldExpression><![CDATA[$F{status}]]></textFieldExpression></textField>
+        </band>
+    </detail>
+    <summary>
+        <band height="70">
+            <staticText><reportElement x="0" y="5" width="150" height="18"/><text><![CDATA[Decision Summary]]></text></staticText>
+            <textField><reportElement x="0" y="28" width="190" height="18"/><textFieldExpression><![CDATA["Class Average: " + $F{class_average}]]></textFieldExpression></textField>
+            <textField><reportElement x="200" y="28" width="170" height="18"/><textFieldExpression><![CDATA["Highest Mark: " + $F{highest_mark}]]></textFieldExpression></textField>
+            <textField><reportElement x="380" y="28" width="170" height="18"/><textFieldExpression><![CDATA["Lowest Mark: " + $F{lowest_mark}]]></textFieldExpression></textField>
+            <textField><reportElement x="560" y="28" width="190" height="18"/><textFieldExpression><![CDATA["Pass Rate: " + $F{pass_rate} + "%"]]></textFieldExpression></textField>
+        </band>
+    </summary>
+</jasperReport>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport name="individual_student_result" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="4c7bd76b-e94e-4b8c-b999-ead101000002">
+    <parameter name="STUDENT_ID" class="java.lang.String"/>
+    <queryString><![CDATA[
+SELECT s.student_id, s.full_name, s.pathway, s.batch_year,
+       m.module_code, m.module_name, m.credit_hours,
+       r.total_mark, r.grade_letter, r.grade_point, r.status
+FROM students s
+JOIN enrollments e ON e.student_id=s.student_id
+JOIN modules m ON m.module_code=e.module_code
+LEFT JOIN results r ON r.enrollment_id=e.enrollment_id
+WHERE s.student_id=$P{STUDENT_ID}
+ORDER BY m.module_code
+    ]]></queryString>
+    <field name="student_id" class="java.lang.String"/>
+    <field name="full_name" class="java.lang.String"/>
+    <field name="pathway" class="java.lang.String"/>
+    <field name="batch_year" class="java.lang.Integer"/>
+    <field name="module_code" class="java.lang.String"/>
+    <field name="module_name" class="java.lang.String"/>
+    <field name="credit_hours" class="java.lang.Integer"/>
+    <field name="total_mark" class="java.math.BigDecimal"/>
+    <field name="grade_letter" class="java.lang.String"/>
+    <field name="grade_point" class="java.math.BigDecimal"/>
+    <field name="status" class="java.lang.String"/>
+    <title><band height="75">
+        <staticText><reportElement x="0" y="0" width="555" height="28"/><textElement textAlignment="Center"><font size="18" isBold="true"/></textElement><text><![CDATA[Individual Student Result Sheet]]></text></staticText>
+        <textField><reportElement x="0" y="35" width="555" height="20"/><textElement textAlignment="Center"/><textFieldExpression><![CDATA[$F{student_id} + " - " + $F{full_name}]]></textFieldExpression></textField>
+    </band></title>
+    <columnHeader><band height="25">
+        <staticText><reportElement x="0" y="0" width="75" height="20"/><text><![CDATA[Module]]></text></staticText>
+        <staticText><reportElement x="80" y="0" width="250" height="20"/><text><![CDATA[Module Name]]></text></staticText>
+        <staticText><reportElement x="335" y="0" width="50" height="20"/><text><![CDATA[Credits]]></text></staticText>
+        <staticText><reportElement x="390" y="0" width="55" height="20"/><text><![CDATA[Mark]]></text></staticText>
+        <staticText><reportElement x="450" y="0" width="45" height="20"/><text><![CDATA[Grade]]></text></staticText>
+        <staticText><reportElement x="500" y="0" width="55" height="20"/><text><![CDATA[Status]]></text></staticText>
+    </band></columnHeader>
+    <detail><band height="22">
+        <textField><reportElement x="0" y="0" width="75" height="18"/><textFieldExpression><![CDATA[$F{module_code}]]></textFieldExpression></textField>
+        <textField><reportElement x="80" y="0" width="250" height="18"/><textFieldExpression><![CDATA[$F{module_name}]]></textFieldExpression></textField>
+        <textField><reportElement x="335" y="0" width="50" height="18"/><textFieldExpression><![CDATA[$F{credit_hours}]]></textFieldExpression></textField>
+        <textField><reportElement x="390" y="0" width="55" height="18"/><textFieldExpression><![CDATA[$F{total_mark}]]></textFieldExpression></textField>
+        <textField><reportElement x="450" y="0" width="45" height="18"/><textFieldExpression><![CDATA[$F{grade_letter}]]></textFieldExpression></textField>
+        <textField><reportElement x="500" y="0" width="55" height="18"/><textFieldExpression><![CDATA[$F{status}]]></textFieldExpression></textField>
+    </band></detail>
+</jasperReport>
