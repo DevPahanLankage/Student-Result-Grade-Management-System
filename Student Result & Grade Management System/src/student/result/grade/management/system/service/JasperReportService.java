@@ -22,10 +22,20 @@ public class JasperReportService {
         return generateHtml(batchReport, Map.of(), outputFile);
     }
 
+    public Path generateBatchPdf(Path outputFile) {
+        return generatePdf(batchReport, Map.of(), outputFile);
+    }
+
     public Path generateStudentHtml(String studentId, Path outputFile) {
         Map<String, Object> params = new HashMap<>();
         params.put("STUDENT_ID", studentId);
         return generateHtml(studentReport, params, outputFile);
+    }
+
+    public Path generateStudentPdf(String studentId, Path outputFile) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("STUDENT_ID", studentId);
+        return generatePdf(studentReport, params, outputFile);
     }
 
     private Path generateHtml(Path reportSource, Map<String, Object> parameters, Path outputFile) {
@@ -34,6 +44,18 @@ public class JasperReportService {
             JasperReport report = JasperCompileManager.compileReport(reportSource.toString());
             JasperPrint print = JasperFillManager.fillReport(report, parameters, connection);
             JasperExportManager.exportReportToHtmlFile(print, outputFile.toString());
+            return outputFile;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to generate Jasper report: " + e.getMessage(), e);
+        }
+    }
+
+    private Path generatePdf(Path reportSource, Map<String, Object> parameters, Path outputFile) {
+        ensureParentDirectory(outputFile);
+        try (Connection connection = DatabaseConnection.open()) {
+            JasperReport report = JasperCompileManager.compileReport(reportSource.toString());
+            JasperPrint print = JasperFillManager.fillReport(report, parameters, connection);
+            JasperExportManager.exportReportToPdfFile(print, outputFile.toString());
             return outputFile;
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate Jasper report: " + e.getMessage(), e);

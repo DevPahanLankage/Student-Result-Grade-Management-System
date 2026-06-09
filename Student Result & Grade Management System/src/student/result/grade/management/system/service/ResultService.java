@@ -41,6 +41,25 @@ public class ResultService {
     }
 
     public double calculateGpa(String studentId) {
+        return calculateCgpa(studentId);
+    }
+
+    public double calculateSemesterGpa(String studentId, int semester, int academicYear) {
+        double weightedPoints = 0;
+        int totalCredits = 0;
+        for (ResultRow row : store.getResultRows()) {
+            if (row.getStudent().getId().equals(studentId)
+                    && row.getEnrollment().getSemester() == semester
+                    && row.getEnrollment().getAcademicYear() == academicYear
+                    && row.getResult() != null) {
+                weightedPoints += row.getResult().getGradePoint() * row.getModule().getCreditHours();
+                totalCredits += row.getModule().getCreditHours();
+            }
+        }
+        return totalCredits == 0 ? 0 : weightedPoints / totalCredits;
+    }
+
+    public double calculateCgpa(String studentId) {
         double weightedPoints = 0;
         int totalCredits = 0;
         for (ResultRow row : store.getResultRows()) {
@@ -52,6 +71,25 @@ public class ResultService {
         return totalCredits == 0 ? 0 : weightedPoints / totalCredits;
     }
 
+    public double latestSemesterGpa(String studentId) {
+        int latestYear = Integer.MIN_VALUE;
+        int latestSemester = Integer.MIN_VALUE;
+        for (ResultRow row : store.getResultRows()) {
+            if (row.getStudent().getId().equals(studentId) && row.getResult() != null) {
+                int year = row.getEnrollment().getAcademicYear();
+                int semester = row.getEnrollment().getSemester();
+                if (year > latestYear || (year == latestYear && semester > latestSemester)) {
+                    latestYear = year;
+                    latestSemester = semester;
+                }
+            }
+        }
+        if (latestYear == Integer.MIN_VALUE) {
+            return 0;
+        }
+        return calculateSemesterGpa(studentId, latestSemester, latestYear);
+    }
+
     public boolean isAtRisk(String studentId) {
         List<ResultRow> completed = store.getResultRows().stream()
                 .filter(row -> row.getStudent().getId().equals(studentId) && row.getResult() != null)
@@ -60,7 +98,7 @@ public class ResultService {
             return false;
         }
         boolean failed = completed.stream().anyMatch(row -> row.getResult().getStatus() != ResultStatus.PASS);
-        return failed || calculateGpa(studentId) < 2.0;
+        return failed || calculateCgpa(studentId) < 2.0;
     }
 
     public List<Student> getAtRiskStudents() {
@@ -102,7 +140,7 @@ public class ResultService {
             writer.newLine();
             for (Student student : getAtRiskStudents()) {
                 writer.write(csv(student.getId()) + "," + csv(student.getFullName()) + ","
-                        + csv(student.getPathway()) + "," + format(calculateGpa(student.getId()))
+                        + csv(student.getPathway()) + "," + format(calculateCgpa(student.getId()))
                         + "," + csv(reason(student.getId())));
                 writer.newLine();
             }
@@ -141,7 +179,7 @@ public class ResultService {
         if (failed) {
             return "Failed or repeat module";
         }
-        return "GPA below 2.0";
+        return "CGPA below 2.0";
     }
 
     public long completedResultCount() {

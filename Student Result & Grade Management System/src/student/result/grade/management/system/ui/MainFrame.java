@@ -266,11 +266,19 @@ public class MainFrame extends JFrame {
             JButton batchReport = new JButton("Generate Batch Jasper Report");
             batchReport.addActionListener(e -> chooseAndRunAndOpen("batch-performance-summary.html",
                 path -> jasperReports.generateBatchHtml(path)));
+            JButton batchPdf = new JButton("Generate Batch PDF");
+            batchPdf.addActionListener(e -> chooseAndRunAndOpen("batch-performance-summary.pdf",
+                path -> jasperReports.generateBatchPdf(path)));
             JButton studentReport = new JButton("Generate Student Jasper Report");
             studentReport.addActionListener(e -> chooseAndRunAndOpen("student-result.html",
                 path -> jasperReports.generateStudentHtml(selectedKey(studentBox), path)));
+            JButton studentPdf = new JButton("Generate Student PDF");
+            studentPdf.addActionListener(e -> chooseAndRunAndOpen("student-result.pdf",
+                path -> jasperReports.generateStudentPdf(selectedKey(studentBox), path)));
             panel.add(batchReport);
+            panel.add(batchPdf);
             panel.add(studentReport);
+            panel.add(studentPdf);
         }
         JButton csv = new JButton("Export At-Risk CSV");
         csv.addActionListener(e -> chooseAndRun("at-risk-students.csv", path -> service.exportAtRiskCsv(path)));
@@ -294,7 +302,11 @@ public class MainFrame extends JFrame {
         JButton report = new JButton("Generate My Jasper Report");
         report.addActionListener(e -> chooseAndRunAndOpen("my-result.html",
                 path -> jasperReports.generateStudentHtml(user.getLinkedStudentId(), path)));
+        JButton pdf = new JButton("Generate My PDF");
+        pdf.addActionListener(e -> chooseAndRunAndOpen("my-result.pdf",
+            path -> jasperReports.generateStudentPdf(user.getLinkedStudentId(), path)));
         actions.add(report);
+        actions.add(pdf);
         panel.add(actions, BorderLayout.NORTH);
         panel.add(new JScrollPane(resultTable), BorderLayout.CENTER);
         return panel;
@@ -316,7 +328,8 @@ public class MainFrame extends JFrame {
         if (user.getRole() == Role.STUDENT) {
             dashboard.setText("<html><div style='padding:25px'><h1>My Academic Dashboard</h1>"
                     + "<p>Student ID: " + user.getLinkedStudentId() + "</p>"
-                    + "<p>GPA: " + service.format(service.calculateGpa(user.getLinkedStudentId())) + "</p>"
+                    + "<p>Semester GPA: " + service.format(service.latestSemesterGpa(user.getLinkedStudentId())) + "</p>"
+                    + "<p>CGPA: " + service.format(service.calculateCgpa(user.getLinkedStudentId())) + "</p>"
                     + "<p>Standing: " + (service.isAtRisk(user.getLinkedStudentId()) ? "AT RISK" : "GOOD STANDING")
                     + "</p></div></html>");
             return;
