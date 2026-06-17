@@ -16,7 +16,12 @@ SELECT s.student_id,
        (SELECT AVG(r2.total_mark) FROM results r2) AS class_average,
        (SELECT MAX(r2.total_mark) FROM results r2) AS highest_mark,
        (SELECT MIN(r2.total_mark) FROM results r2) AS lowest_mark,
-       (SELECT 100.0 * SUM(r2.status='PASS') / NULLIF(COUNT(*),0) FROM results r2) AS pass_rate
+       (SELECT 100.0 * SUM(r2.status='PASS') / NULLIF(COUNT(*),0) FROM results r2) AS pass_rate,
+       (SELECT COUNT(*) FROM results r2 WHERE r2.grade_letter='A') AS grade_a_count,
+       (SELECT COUNT(*) FROM results r2 WHERE r2.grade_letter='B') AS grade_b_count,
+       (SELECT COUNT(*) FROM results r2 WHERE r2.grade_letter='C') AS grade_c_count,
+       (SELECT COUNT(*) FROM results r2 WHERE r2.grade_letter='D') AS grade_d_count,
+       (SELECT COUNT(*) FROM results r2 WHERE r2.grade_letter='F') AS grade_f_count
 FROM students s
 JOIN enrollments e ON e.student_id = s.student_id
 JOIN modules m ON m.module_code = e.module_code
@@ -38,6 +43,11 @@ ORDER BY s.student_id, m.module_code
     <field name="highest_mark" class="java.math.BigDecimal"/>
     <field name="lowest_mark" class="java.math.BigDecimal"/>
     <field name="pass_rate" class="java.math.BigDecimal"/>
+    <field name="grade_a_count" class="java.lang.Long"/>
+    <field name="grade_b_count" class="java.lang.Long"/>
+    <field name="grade_c_count" class="java.lang.Long"/>
+    <field name="grade_d_count" class="java.lang.Long"/>
+    <field name="grade_f_count" class="java.lang.Long"/>
     <title>
         <band height="50">
             <staticText>
@@ -56,7 +66,7 @@ ORDER BY s.student_id, m.module_code
             <staticText><reportElement x="260" y="0" width="80" height="20"/><text><![CDATA[Module]]></text></staticText>
             <staticText><reportElement x="345" y="0" width="190" height="20"/><text><![CDATA[Module Name]]></text></staticText>
             <staticText><reportElement x="540" y="0" width="60" height="20"/><text><![CDATA[Credits]]></text></staticText>
-            <staticText><reportElement x="605" y="0" width="60" height="20"/><text><![CDATA[Mark]]></text></staticText>
+            <staticText><reportElement x="605" y="0" width="60" height="20"/><text><![CDATA[Mark %]]></text></staticText>
             <staticText><reportElement x="670" y="0" width="60" height="20"/><text><![CDATA[Grade]]></text></staticText>
             <staticText><reportElement x="735" y="0" width="65" height="20"/><text><![CDATA[Status]]></text></staticText>
         </band>
@@ -74,12 +84,18 @@ ORDER BY s.student_id, m.module_code
         </band>
     </detail>
     <summary>
-        <band height="70">
-            <staticText><reportElement x="0" y="5" width="150" height="18"/><text><![CDATA[Decision Summary]]></text></staticText>
+        <band height="95">
+            <staticText><reportElement x="0" y="5" width="150" height="18"/><textElement><font isBold="true"/></textElement><text><![CDATA[Decision Summary]]></text></staticText>
             <textField><reportElement x="0" y="28" width="190" height="18"/><textFieldExpression><![CDATA["Class Average: " + $F{class_average}]]></textFieldExpression></textField>
             <textField><reportElement x="200" y="28" width="170" height="18"/><textFieldExpression><![CDATA["Highest Mark: " + $F{highest_mark}]]></textFieldExpression></textField>
             <textField><reportElement x="380" y="28" width="170" height="18"/><textFieldExpression><![CDATA["Lowest Mark: " + $F{lowest_mark}]]></textFieldExpression></textField>
             <textField><reportElement x="560" y="28" width="190" height="18"/><textFieldExpression><![CDATA["Pass Rate: " + $F{pass_rate} + "%"]]></textFieldExpression></textField>
+            <staticText><reportElement x="0" y="55" width="150" height="18"/><textElement><font isBold="true"/></textElement><text><![CDATA[Grade Distribution]]></text></staticText>
+            <textField><reportElement x="0" y="75" width="100" height="18"/><textFieldExpression><![CDATA["A: " + $F{grade_a_count}]]></textFieldExpression></textField>
+            <textField><reportElement x="100" y="75" width="100" height="18"/><textFieldExpression><![CDATA["B: " + $F{grade_b_count}]]></textFieldExpression></textField>
+            <textField><reportElement x="200" y="75" width="100" height="18"/><textFieldExpression><![CDATA["C: " + $F{grade_c_count}]]></textFieldExpression></textField>
+            <textField><reportElement x="300" y="75" width="100" height="18"/><textFieldExpression><![CDATA["D: " + $F{grade_d_count}]]></textFieldExpression></textField>
+            <textField><reportElement x="400" y="75" width="100" height="18"/><textFieldExpression><![CDATA["F: " + $F{grade_f_count}]]></textFieldExpression></textField>
         </band>
     </summary>
 </jasperReport>

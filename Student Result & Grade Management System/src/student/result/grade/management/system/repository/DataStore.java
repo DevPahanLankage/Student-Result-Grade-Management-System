@@ -5,6 +5,7 @@ import java.util.Optional;
 import student.result.grade.management.system.model.CourseModule;
 import student.result.grade.management.system.model.Enrollment;
 import student.result.grade.management.system.model.GradeRule;
+import student.result.grade.management.system.model.Lecturer;
 import student.result.grade.management.system.model.Result;
 import student.result.grade.management.system.model.ResultRow;
 import student.result.grade.management.system.model.Student;
@@ -20,6 +21,10 @@ public interface DataStore {
     void addModule(CourseModule module);
     void updateModule(CourseModule module);
     void deleteModule(String moduleCode);
+    List<Lecturer> getLecturers();
+    void addLecturer(Lecturer lecturer);
+    void updateLecturer(Lecturer lecturer);
+    void deleteLecturer(String lecturerId);
     List<Enrollment> getEnrollments();
     Enrollment addEnrollment(String studentId, String moduleCode, int semester, int academicYear);
     void deleteEnrollment(int enrollmentId);
@@ -30,4 +35,5 @@ public interface DataStore {
     Optional<Result> getResult(int enrollmentId);
     Optional<Student> findStudent(String studentId);
     Optional<CourseModule> findModule(String moduleCode);
+    Optional<Lecturer> findLecturer(String lecturerId);
 }

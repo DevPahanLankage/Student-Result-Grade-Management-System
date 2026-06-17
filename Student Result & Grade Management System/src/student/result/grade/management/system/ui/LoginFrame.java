@@ -18,8 +18,8 @@ import student.result.grade.management.system.service.ResultService;
 public class LoginFrame extends JFrame {
     private final DataStore store;
     private final ResultService resultService;
-    private final JTextField usernameField = new JTextField("admin", 18);
-    private final JPasswordField passwordField = new JPasswordField("admin123", 18);
+    private final JTextField usernameField = new JTextField(18);
+    private final JPasswordField passwordField = new JPasswordField(18);
 
     public LoginFrame(DataStore store, ResultService resultService) {
         super("Student Result & Grade Management System");

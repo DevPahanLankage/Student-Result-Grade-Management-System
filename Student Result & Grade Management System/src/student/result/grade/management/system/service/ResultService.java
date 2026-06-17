@@ -10,6 +10,7 @@ import java.util.List;
 import student.result.grade.management.system.model.CourseModule;
 import student.result.grade.management.system.model.Enrollment;
 import student.result.grade.management.system.model.GradeRule;
+import student.result.grade.management.system.model.Lecturer;
 import student.result.grade.management.system.model.Result;
 import student.result.grade.management.system.model.ResultRow;
 import student.result.grade.management.system.model.ResultStatus;
@@ -128,6 +129,17 @@ public class ResultService {
             throw new ValidationException("Credit hours must be greater than zero.");
         }
         return new CourseModule(code.trim(), name.trim(), creditValue, semesterValue, yearValue);
+    }
+
+    public Lecturer buildLecturer(String id, String name, String email) {
+        requireText(id, "Lecturer ID");
+        requireText(name, "Full name");
+        requireText(email, "Email");
+        String trimmedEmail = email.trim();
+        if (!trimmedEmail.contains("@") || trimmedEmail.indexOf('@') == trimmedEmail.length() - 1) {
+            throw new ValidationException("Email must be a valid address.");
+        }
+        return new Lecturer(id.trim(), name.trim(), trimmedEmail);
     }
 
     public String format(double value) {

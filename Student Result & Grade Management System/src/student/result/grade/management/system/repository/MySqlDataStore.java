@@ -12,6 +12,7 @@ import java.util.Optional;
 import student.result.grade.management.system.model.CourseModule;
 import student.result.grade.management.system.model.Enrollment;
 import student.result.grade.management.system.model.GradeRule;
+import student.result.grade.management.system.model.Lecturer;
 import student.result.grade.management.system.model.Result;
 import student.result.grade.management.system.model.ResultRow;
 import student.result.grade.management.system.model.ResultStatus;
@@ -105,6 +106,41 @@ public class MySqlDataStore implements DataStore {
     @Override
     public void deleteModule(String moduleCode) {
         execute("DELETE FROM modules WHERE module_code=?", ps -> ps.setString(1, moduleCode));
+    }
+
+    @Override
+    public List<Lecturer> getLecturers() {
+        String sql = "SELECT lecturer_id, full_name, email FROM lecturers ORDER BY lecturer_id";
+        List<Lecturer> items = new ArrayList<>();
+        try (Connection c = DatabaseConnection.open(); Statement st = c.createStatement(); ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) items.add(lecturer(rs));
+            return items;
+        } catch (SQLException e) {
+            throw db(e);
+        }
+    }
+
+    @Override
+    public void addLecturer(Lecturer lecturer) {
+        execute("INSERT INTO lecturers(lecturer_id, full_name, email) VALUES(?,?,?)", ps -> {
+            ps.setString(1, lecturer.getLecturerId());
+            ps.setString(2, lecturer.getFullName());
+            ps.setString(3, lecturer.getEmail());
+        });
+    }
+
+    @Override
+    public void updateLecturer(Lecturer lecturer) {
+        execute("UPDATE lecturers SET full_name=?, email=? WHERE lecturer_id=?", ps -> {
+            ps.setString(1, lecturer.getFullName());
+            ps.setString(2, lecturer.getEmail());
+            ps.setString(3, lecturer.getLecturerId());
+        });
+    }
+
+    @Override
+    public void deleteLecturer(String lecturerId) {
+        execute("DELETE FROM lecturers WHERE lecturer_id=?", ps -> ps.setString(1, lecturerId));
     }
 
     @Override
@@ -250,6 +286,11 @@ public class MySqlDataStore implements DataStore {
         return getModules().stream().filter(m -> m.getCode().equals(moduleCode)).findFirst();
     }
 
+    @Override
+    public Optional<Lecturer> findLecturer(String lecturerId) {
+        return getLecturers().stream().filter(l -> l.getLecturerId().equals(lecturerId)).findFirst();
+    }
+
     private User user(ResultSet rs) throws SQLException {
         return new User(rs.getString("username"), rs.getString("password_hash"),
                 Role.valueOf(rs.getString("role")), rs.getString("linked_student_id"));
@@ -263,6 +304,10 @@ public class MySqlDataStore implements DataStore {
     private CourseModule module(ResultSet rs) throws SQLException {
         return new CourseModule(rs.getString("module_code"), rs.getString("module_name"),
                 rs.getInt("credit_hours"), rs.getInt("semester"), rs.getInt("academic_year"));
+    }
+
+    private Lecturer lecturer(ResultSet rs) throws SQLException {
+        return new Lecturer(rs.getString("lecturer_id"), rs.getString("full_name"), rs.getString("email"));
     }
 
     private Enrollment enrollment(ResultSet rs) throws SQLException {

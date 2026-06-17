@@ -10,6 +10,7 @@ import java.util.Optional;
 import student.result.grade.management.system.model.CourseModule;
 import student.result.grade.management.system.model.Enrollment;
 import student.result.grade.management.system.model.GradeRule;
+import student.result.grade.management.system.model.Lecturer;
 import student.result.grade.management.system.model.Result;
 import student.result.grade.management.system.model.ResultRow;
 import student.result.grade.management.system.model.Role;
@@ -21,6 +22,7 @@ public class SampleDataStore implements DataStore {
     private final Map<String, User> users = new LinkedHashMap<>();
     private final Map<String, Student> students = new LinkedHashMap<>();
     private final Map<String, CourseModule> modules = new LinkedHashMap<>();
+    private final Map<String, Lecturer> lecturers = new LinkedHashMap<>();
     private final Map<Integer, Enrollment> enrollments = new LinkedHashMap<>();
     private final Map<Integer, Result> results = new LinkedHashMap<>();
     private final List<GradeRule> gradeRules = new ArrayList<>();
@@ -48,6 +50,8 @@ public class SampleDataStore implements DataStore {
         addModule(new CourseModule("EAD101", "Enterprise Application Development", 4, 1, 2026));
         addModule(new CourseModule("DBS101", "Database Systems", 3, 1, 2026));
         addModule(new CourseModule("OOP101", "Object Oriented Programming", 3, 1, 2026));
+
+        addLecturer(new Lecturer("LEC001", "Dr. N. Silva", "n.silva@nibm.lk"));
 
         addEnrollment("CODSE251P-001", "EAD101", 1, 2026);
         addEnrollment("CODSE251P-001", "DBS101", 1, 2026);
@@ -103,6 +107,24 @@ public class SampleDataStore implements DataStore {
         boolean hasEnrollment = enrollments.values().stream().anyMatch(e -> e.getModuleCode().equals(moduleCode));
         requireUnique(!hasEnrollment, "Cannot delete a module with enrollments.");
         modules.remove(moduleCode);
+    }
+
+    public List<Lecturer> getLecturers() {
+        return lecturers.values().stream().sorted(Comparator.comparing(Lecturer::getLecturerId)).toList();
+    }
+
+    public void addLecturer(Lecturer lecturer) {
+        requireUnique(!lecturers.containsKey(lecturer.getLecturerId()), "Lecturer ID already exists.");
+        lecturers.put(lecturer.getLecturerId(), lecturer);
+    }
+
+    public void updateLecturer(Lecturer lecturer) {
+        requireUnique(lecturers.containsKey(lecturer.getLecturerId()), "Lecturer ID was not found.");
+        lecturers.put(lecturer.getLecturerId(), lecturer);
+    }
+
+    public void deleteLecturer(String lecturerId) {
+        lecturers.remove(lecturerId);
     }
 
     public List<Enrollment> getEnrollments() {
@@ -164,6 +186,10 @@ public class SampleDataStore implements DataStore {
 
     public Optional<CourseModule> findModule(String moduleCode) {
         return Optional.ofNullable(modules.get(moduleCode));
+    }
+
+    public Optional<Lecturer> findLecturer(String lecturerId) {
+        return Optional.ofNullable(lecturers.get(lecturerId));
     }
 
     private void requireUnique(boolean condition, String message) {

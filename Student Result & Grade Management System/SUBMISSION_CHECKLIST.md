@@ -1,11 +1,13 @@
 # Submission Checklist
 
 - Start MySQL and confirm `student_result_system` exists.
-- Run `database/upgrade_existing_database.sql` once if the foreign key is not present.
+- Run `database/schema.sql` then `database/seed.sql` (includes demo results A–F).
+- Run `database/upgrade_existing_database.sql` once if upgrading an older database.
+- Copy `config/db.properties.example` to `config/db.properties`.
 - Confirm `DatabaseCheck` and `LogicCheck` pass.
-- Enter several results covering pass and repeat grades.
-- Preview and export both JRXML reports from Jaspersoft Studio.
-- Capture screenshots of login, dashboard, CRUD, result entry, at-risk list, reports, and MySQL tables.
-- Clean and build the NetBeans project.
-- Confirm the built JAR runs on the submission computer.
-- Include schema, seed data, proposal, report document, screenshots, and GitHub link.
+- NetBeans **Clean and Build** — verify `dist/Student_Result___Grade_Management_System.jar` runs via `run.ps1`.
+- Preview/export both JRXML reports (batch shows grade distribution; individual shows GPA/standing).
+- Capture screenshots per `submission/SCREENSHOTS.md`.
+- Export `docs/COURSEWORK_REPORT.md` to PDF for LMS.
+- Push to GitHub and submit link on LMS.
+- Include proposal PDF, report, screenshots, schema, and seed data.

@@ -25,6 +25,7 @@ import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import student.result.grade.management.system.model.CourseModule;
 import student.result.grade.management.system.model.Enrollment;
+import student.result.grade.management.system.model.Lecturer;
 import student.result.grade.management.system.model.Result;
 import student.result.grade.management.system.model.ResultRow;
 import student.result.grade.management.system.model.Role;
@@ -38,12 +39,13 @@ import student.result.grade.management.system.service.ValidationException;
 public class MainFrame extends JFrame {
     private final DataStore store;
     private final ResultService service;
-    private final JasperReportService jasperReports = new JasperReportService();
+    private final JasperReportService jasperReports;
     private final User user;
     private final JTabbedPane tabs = new JTabbedPane();
     private final JLabel dashboard = new JLabel();
     private JTable studentTable;
     private JTable moduleTable;
+    private JTable lecturerTable;
     private JTable enrollmentTable;
     private JTable resultTable;
     private JTable atRiskTable;
@@ -53,6 +55,7 @@ public class MainFrame extends JFrame {
         this.store = store;
         this.service = service;
         this.user = user;
+        this.jasperReports = new JasperReportService(service);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1050, 680);
         setLocationRelativeTo(null);
@@ -66,6 +69,7 @@ public class MainFrame extends JFrame {
         if (user.getRole() == Role.ADMIN) {
             tabs.add("Students", studentsPanel());
             tabs.add("Modules", modulesPanel());
+            tabs.add("Lecturers", lecturersPanel());
             tabs.add("Enrollments", enrollmentsPanel());
         }
         if (user.getRole() == Role.ADMIN || user.getRole() == Role.LECTURER) {
@@ -172,6 +176,40 @@ public class MainFrame extends JFrame {
             }
         });
         return split(form, moduleTable);
+    }
+
+    private JPanel lecturersPanel() {
+        lecturerTable = table("ID", "Name", "Email");
+        JPanel form = formPanel("ID", "Name", "Email");
+        JTextField id = (JTextField) form.getClientProperty("ID");
+        JTextField name = (JTextField) form.getClientProperty("Name");
+        JTextField email = (JTextField) form.getClientProperty("Email");
+        JButton add = new JButton("Add");
+        add.addActionListener(e -> runSafe(() -> {
+            store.addLecturer(service.buildLecturer(id.getText(), name.getText(), email.getText()));
+            refreshAll();
+        }));
+        JButton update = new JButton("Update");
+        update.addActionListener(e -> runSafe(() -> {
+            store.updateLecturer(service.buildLecturer(id.getText(), name.getText(), email.getText()));
+            refreshAll();
+        }));
+        JButton delete = new JButton("Delete");
+        delete.addActionListener(e -> runSafe(() -> {
+            if (!confirm("Delete lecturer " + id.getText().trim() + "?")) return;
+            store.deleteLecturer(id.getText().trim());
+            refreshAll();
+        }));
+        addButtons(form, add, update, delete);
+        lecturerTable.getSelectionModel().addListSelectionListener(e -> {
+            int r = lecturerTable.getSelectedRow();
+            if (r >= 0) {
+                id.setText(value(lecturerTable, r, 0));
+                name.setText(value(lecturerTable, r, 1));
+                email.setText(value(lecturerTable, r, 2));
+            }
+        });
+        return split(form, lecturerTable);
     }
 
     private JPanel enrollmentsPanel() {
@@ -316,6 +354,7 @@ public class MainFrame extends JFrame {
         refreshDashboard();
         refreshStudents();
         refreshModules();
+        refreshLecturers();
         refreshEnrollments();
         refreshResults();
         refreshAtRisk();
@@ -362,6 +401,15 @@ public class MainFrame extends JFrame {
         model.setRowCount(0);
         for (CourseModule m : store.getModules()) {
             model.addRow(new Object[]{m.getCode(), m.getName(), m.getCreditHours(), m.getSemester(), m.getAcademicYear()});
+        }
+    }
+
+    private void refreshLecturers() {
+        if (lecturerTable == null) return;
+        DefaultTableModel model = model(lecturerTable);
+        model.setRowCount(0);
+        for (Lecturer l : store.getLecturers()) {
+            model.addRow(new Object[]{l.getLecturerId(), l.getFullName(), l.getEmail()});
         }
     }
 

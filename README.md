@@ -1,16 +1,12 @@
 # Student Result & Grade Management System
 
-Java Swing coursework application for EAD-1. The system supports student and module management, enrollments, result entry, grade/GPA calculation, at-risk detection, CSV export, and report generation.
+Java Swing coursework application for EAD-1. The system supports student and module management, enrollments, result entry, grade/GPA calculation, at-risk detection, CSV export, and Jasper report generation.
 
-## Quick Run
+## Quick Run (NetBeans)
 
-Open `Student Result & Grade Management System` in NetBeans, or run from that project folder:
-
-```powershell
-cd "Student Result & Grade Management System"
-javac -d build/classes (Get-ChildItem -Recurse src -Filter *.java).FullName
-java -cp build/classes student.result.grade.management.system.StudentResultGradeManagementSystem
-```
+1. Open `Student Result & Grade Management System` in NetBeans.
+2. Set up MySQL (see below) and `config/db.properties`.
+3. Press **Run** (F6).
 
 Default logins:
 
@@ -25,51 +21,57 @@ Default logins:
 MySQL scripts are in `Student Result & Grade Management System/database/`.
 
 1. Create the schema with `database/schema.sql`.
-2. Load demo data with `database/seed.sql`.
+2. Load demo data with `database/seed.sql` (includes sample results for grades A–F).
 3. Copy `config/db.properties.example` to `config/db.properties` and enter the MySQL password.
-4. Connector/J is bundled in the project `lib/` directory and already configured in NetBeans.
+4. Connector/J and JasperReports JARs belong in the project `lib/` directory (configured in NetBeans).
 
-The application uses MySQL through JDBC. Keep MySQL running and ensure `config/db.properties` contains the correct credentials before starting the app.
-
-To verify the connection without opening the GUI, run:
+Verify without the GUI:
 
 ```powershell
-java -cp "path\to\mysql-connector-j-9.7.0.jar;build\classes" student.result.grade.management.system.DatabaseCheck
+cd "Student Result & Grade Management System"
+java -cp "lib/*;build/classes" student.result.grade.management.system.DatabaseCheck
+java -cp "lib/*;build/classes" student.result.grade.management.system.LogicCheck
 ```
+
+## Deployment
+
+See [`DEPLOYMENT.md`](Student%20Result%20&%20Grade%20Management%20System/DEPLOYMENT.md) for build and JAR instructions.
+
+After **Clean and Build**:
+
+```powershell
+cd "Student Result & Grade Management System"
+.\run.ps1
+```
+
+The working directory must contain `config/` and `reports/`.
 
 ## JasperReports
 
-The project contains two Jasper designs:
+- `reports/batch_performance_summary.jrxml` — decision report with grade distribution
+- `reports/individual_student_result.jrxml` — per-student sheet with GPA and standing
 
-- `reports/batch_performance_summary.jrxml`
-- `reports/individual_student_result.jrxml`
-
-Open them through the application's Reports tab or directly in Jaspersoft Studio. Create a JDBC data adapter using the same connection details as `config/db.properties`, then preview/export the reports as PDF.
-
-The app also generates an HTML batch report and CSV exports from the Reports tab so the report workflow is demonstrable even before Jasper libraries are linked.
+Generate from the Reports tab or preview in Jaspersoft Studio using the same JDBC settings as `config/db.properties`.
 
 ## Coursework Coverage
 
-- User interfaces: login, dashboard, data input, transaction, output/report screens.
-- OOP: model, service, repository, UI, utility packages.
-- Exception handling: validation and service exceptions shown in dialogs.
-- IO streams: CSV and HTML report export.
-- Multithreading: reports run in a `SwingWorker`.
-- Data store: normalized MySQL schema and seed data.
+- User interfaces: login, dashboard, data input, transaction, output/report screens
+- OOP: model, service, repository, UI packages
+- Exception handling: validation and service exceptions shown in dialogs
+- IO streams: CSV and HTML report export
+- Multithreading: reports run in a `SwingWorker`
+- Data store: normalized MySQL schema and seed data
+- Design pattern: Repository pattern via `DataStore` interface
 
-## Verification
+## Documentation
 
-Run these classes from NetBeans:
-
-- `DatabaseCheck`: confirms live MySQL connectivity and row counts.
-- `DatabaseUpgrade`: safely upgrades an existing database relationship and password hashes.
-- `LogicCheck`: verifies grade boundaries and invalid-mark handling.
+- [`docs/COURSEWORK_REPORT.md`](Student%20Result%20&%20Grade%20Management%20System/docs/COURSEWORK_REPORT.md) — written report (export to PDF for LMS)
+- [`submission/README.md`](submission/README.md) — submission checklist
+- [`SUBMISSION_CHECKLIST.md`](Student%20Result%20&%20Grade%20Management%20System/SUBMISSION_CHECKLIST.md) — pre-submission steps
 
 ## Demonstration Flow
 
-1. Log in as Admin and demonstrate student/module CRUD and enrollment.
-2. Log in as Lecturer and enter results.
-3. Show automatic totals, grades, dashboard statistics, and at-risk students.
-4. Export the at-risk CSV and batch HTML report.
-5. Open both Jasper designs and preview/export them in Jaspersoft Studio.
-6. Log in as Student and show the student-specific dashboard and results.
+1. Log in as Admin — student/module CRUD, enrollments, lecturers
+2. Log in as Lecturer — enter results, view at-risk list
+3. Export at-risk CSV and batch Jasper PDF (grade distribution)
+4. Log in as Student — personal dashboard, My Results, Jasper PDF
