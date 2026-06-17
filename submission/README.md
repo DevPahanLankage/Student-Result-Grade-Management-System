@@ -2,9 +2,9 @@
 
 ## GitHub Repository
 
-Push the project to GitHub and submit the repository URL on LMS.
+**URL:** https://github.com/DevPahanLankage/Student-Result-Grade-Management-System
 
-Suggested repository structure:
+Submit this link on LMS.
 ```
 courseworkv1/
 ├── README.md
